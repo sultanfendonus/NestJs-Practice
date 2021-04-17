@@ -22,6 +22,7 @@ import {
   ApiProperty,
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { first } from './dec';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -45,6 +46,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @first('blue')
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll() {

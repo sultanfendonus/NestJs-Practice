@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @ApiProperty()
-  @IsEmail()
+  @IsEmail({}, { message: 'Please input a correct email.' })
   email: string;
 
   @ApiProperty()

@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export type UserRoleType = 'admin' | 'user';
 
@@ -18,7 +17,6 @@ export class User {
   lastName: string;
 
   @ApiProperty({ example: 'sunny@gmail.com' })
-  @IsEmail()
   @Column()
   email: string;
 
