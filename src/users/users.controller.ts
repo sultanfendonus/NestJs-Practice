@@ -14,12 +14,31 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { saltRounds } from './helper/constant';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiProperty,
+} from '@nestjs/swagger';
+import { User } from './entities/user.entity';
 
+@ApiBearerAuth()
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create A new user' })
+  @ApiResponse({
+    status: 200,
+    description: 'The found record',
+    type: User,
+  })
+  @ApiProperty({
+    type: User,
+  })
   create(@Body() createUserDto: CreateUserDto) {
     const hashPassword = bcrypt.hashSync(createUserDto.password, saltRounds);
     createUserDto.password = hashPassword;
