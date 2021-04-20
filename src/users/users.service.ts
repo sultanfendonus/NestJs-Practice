@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReadUserDTO } from './dto/read-user.dto';
+import { CustomException } from '../helper/custom.exception';
 
 @Injectable()
 export class UsersService {
@@ -23,11 +24,14 @@ export class UsersService {
       email: createUserDto.email,
     });
     if (user) {
-      throw new NotAcceptableException({
-        statusCode: HttpStatus.NOT_ACCEPTABLE,
-        message: ['The email already exist'],
-        error: 'Not Acceptable',
-      });
+      throw new CustomException(
+        {
+          statusCode: HttpStatus.NOT_ACCEPTABLE,
+          message: ['The email already exist'],
+          error: 'Not Acceptable',
+        },
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
     const newUser = await this.usersRepository.save(createUserDto);
     return new ReadUserDTO(newUser);
