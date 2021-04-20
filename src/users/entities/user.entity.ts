@@ -17,7 +17,7 @@ export class User {
   lastName: string;
 
   @ApiProperty({ example: 'sunny@gmail.com' })
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()

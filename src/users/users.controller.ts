@@ -22,14 +22,14 @@ import {
   ApiProperty,
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
-import { first } from './dec';
+import { calculateTime, first } from './dec';
 
-@ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @calculateTime()
   @Post()
   @ApiOperation({ summary: 'Create A new user' })
   @ApiResponse({
@@ -40,13 +40,15 @@ export class UsersController {
   @ApiProperty({
     type: User,
   })
+  @UseInterceptors(ClassSerializerInterceptor)
   create(@Body() createUserDto: CreateUserDto) {
     const hashPassword = bcrypt.hashSync(createUserDto.password, saltRounds);
     createUserDto.password = hashPassword;
     return this.usersService.create(createUserDto);
   }
 
-  @first('blue')
+  @ApiBearerAuth()
+  @calculateTime()
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll() {
