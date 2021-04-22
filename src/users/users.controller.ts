@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { calculateTime, first } from './dec';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -45,6 +46,21 @@ export class UsersController {
     const hashPassword = bcrypt.hashSync(createUserDto.password, saltRounds);
     createUserDto.password = hashPassword;
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Login Users' })
+  @ApiResponse({
+    status: 200,
+    description: 'The found record',
+    type: User,
+  })
+  @ApiProperty({
+    type: User,
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
+  login(@Body() loginUserDto: LoginUserDto) {
+    return this.usersService.login(loginUserDto);
   }
 
   @ApiBearerAuth()

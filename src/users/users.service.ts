@@ -11,6 +11,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReadUserDTO } from './dto/read-user.dto';
 import { CustomException } from '../helper/custom.exception';
+import { LoginUserDto } from './dto/login-user.dto';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
+import { secretKey } from './helper/constant';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +38,42 @@ export class UsersService {
       );
     }
     const newUser = await this.usersRepository.save(createUserDto);
-    return new ReadUserDTO(newUser);
+    const token = await jwt.sign({ email: newUser.email }, secretKey);
+    return new ReadUserDTO({ ...newUser, token });
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    const user = await this.usersRepository.findOne({
+      email: loginUserDto.email,
+    });
+    if (user) {
+      const isValidUser = await bcrypt.compareSync(
+        loginUserDto.password,
+        user.password,
+      );
+      if (isValidUser) {
+        const token = await jwt.sign({ email: user.email }, secretKey);
+        return new ReadUserDTO({ ...user, token });
+      } else {
+        throw new CustomException(
+          {
+            statusCode: HttpStatus.UNAUTHORIZED,
+            message: ['Invalid Credentials'],
+            error: 'Invalid Credentials',
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+    } else {
+      throw new CustomException(
+        {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: ['Invalid Credentials'],
+          error: 'Invalid Credentials',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   async findAll() {
