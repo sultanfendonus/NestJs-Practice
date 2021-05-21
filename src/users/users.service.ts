@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotAcceptableException,
+  Req,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,7 +39,10 @@ export class UsersService {
       );
     }
     const newUser = await this.usersRepository.save(createUserDto);
-    const token = await jwt.sign({ email: newUser.email }, secretKey);
+    const token = await jwt.sign(
+      { email: newUser.email, id: newUser.id },
+      secretKey,
+    );
     return new ReadUserDTO({ ...newUser, token });
   }
 
@@ -52,7 +56,10 @@ export class UsersService {
         user.password,
       );
       if (isValidUser) {
-        const token = await jwt.sign({ email: user.email }, secretKey);
+        const token = await jwt.sign(
+          { email: user.email, id: user.id },
+          secretKey,
+        );
         return new ReadUserDTO({ ...user, token });
       } else {
         throw new CustomException(

@@ -8,6 +8,8 @@ import {
   Delete,
   ClassSerializerInterceptor,
   UseInterceptors,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,6 +26,7 @@ import {
 import { User } from './entities/user.entity';
 import { calculateTime, first } from './dec';
 import { LoginUserDto } from './dto/login-user.dto';
+import { IsLoggedInGuard } from './guard/isLoggedIn';
 
 @ApiTags('users')
 @Controller('users')
@@ -63,27 +66,27 @@ export class UsersController {
     return this.usersService.login(loginUserDto);
   }
 
+  @UseGuards(IsLoggedInGuard)
   @ApiBearerAuth()
-  @calculateTime()
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
-
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+  //
+  // @UseInterceptors(ClassSerializerInterceptor)
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.usersService.findOne(+id);
+  // }
+  //
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(+id, updateUserDto);
+  // }
+  //
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.remove(+id);
+  // }
 }
